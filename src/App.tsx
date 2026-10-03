@@ -23,7 +23,8 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Sparkles
+  Sparkles,
+  Edit3
 } from 'lucide-react';
 import { Header } from './components/Header';
 import { PaySummaryCard } from './components/PaySummaryCard';
@@ -33,6 +34,7 @@ import { BreakTimer } from './components/BreakTimer';
 import { ExportModal } from './components/ExportModal';
 import { SettingsModal } from './components/SettingsModal';
 import { DatabaseViewer } from './components/DatabaseViewer';
+import { TimeCardCorrection } from './components/TimeCardCorrection';
 import { MobileNav } from './components/MobileNav';
 
 import { ShiftRecord, PayPeriodSettings, BiWeeklyCalculation } from './types';
@@ -76,7 +78,7 @@ export default function App() {
   const [shifts, setShifts] = useState<ShiftRecord[]>([]);
 
   // Navigation & Modals state
-  const [activeTab, setActiveTab] = useState<'timesheet' | 'punch' | 'timer' | 'database'>('timesheet');
+  const [activeTab, setActiveTab] = useState<'timesheet' | 'punch' | 'timer' | 'correction' | 'database'>('timesheet');
   const [activeWeekTab, setActiveWeekTab] = useState<'all' | 'week1' | 'week2'>('all');
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -325,6 +327,18 @@ export default function App() {
             </button>
 
             <button
+              onClick={() => setActiveTab('correction')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
+                activeTab === 'correction'
+                  ? 'bg-slate-900 text-white dark:bg-slate-800 shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
+            >
+              <Edit3 className="w-4 h-4 text-purple-500" />
+              <span>Fix Timecard</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('database')}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
                 activeTab === 'database'
@@ -410,6 +424,13 @@ export default function App() {
               defaultLunchMinutes={settings.defaultLunchMinutes}
             />
           </div>
+        )}
+
+        {activeTab === 'correction' && (
+          <TimeCardCorrection
+            settings={settings}
+            onShowToast={showToast}
+          />
         )}
 
         {activeTab === 'database' && (

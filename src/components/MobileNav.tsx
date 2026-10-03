@@ -1,16 +1,15 @@
 import React from 'react';
-import { Clock, Calendar, Coffee, Database, Share2 } from 'lucide-react';
+import { Clock, Calendar, Coffee, Database, Edit3 } from 'lucide-react';
 
 interface MobileNavProps {
-  activeTab: 'timesheet' | 'punch' | 'timer' | 'database';
-  onChangeTab: (tab: 'timesheet' | 'punch' | 'timer' | 'database') => void;
+  activeTab: 'timesheet' | 'punch' | 'timer' | 'correction' | 'database';
+  onChangeTab: (tab: 'timesheet' | 'punch' | 'timer' | 'correction' | 'database') => void;
   onOpenExport: () => void;
 }
 
 export const MobileNav: React.FC<MobileNavProps> = ({
   activeTab,
   onChangeTab,
-  onOpenExport,
 }) => {
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 pb-safe">
@@ -54,13 +53,17 @@ export const MobileNav: React.FC<MobileNavProps> = ({
           <span className="text-[10px]">Timer</span>
         </button>
 
-        {/* Export Modal */}
+        {/* Fix Timecard */}
         <button
-          onClick={onOpenExport}
-          className="flex flex-col items-center justify-center h-full text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition"
+          onClick={() => onChangeTab('correction')}
+          className={`flex flex-col items-center justify-center h-full transition ${
+            activeTab === 'correction'
+              ? 'text-sky-600 dark:text-sky-400 font-bold'
+              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
+          }`}
         >
-          <Share2 className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px]">Export</span>
+          <Edit3 className="w-5 h-5 mb-0.5" />
+          <span className="text-[10px]">Fix Time</span>
         </button>
 
         {/* Database */}

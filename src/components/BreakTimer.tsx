@@ -73,6 +73,31 @@ export const BreakTimer: React.FC<BreakTimerProps> = ({
             playTimerCompletionChime();
           }
 
+          // Trigger Cellphone Vibration & Browser Notification
+          try {
+            if ('vibrate' in navigator) {
+              navigator.vibrate([200, 100, 200, 100, 400]);
+            }
+            if (typeof window !== 'undefined' && 'Notification' in window) {
+              if (Notification.permission === 'granted') {
+                new Notification('ChronoShift Break Over!', {
+                  body: `Your ${activeMode} break timer has finished. Time to get back to work!`,
+                  icon: '/favicon.ico',
+                });
+              } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then((permission) => {
+                  if (permission === 'granted') {
+                    new Notification('ChronoShift Break Over!', {
+                      body: `Your ${activeMode} break timer has finished. Time to get back to work!`,
+                    });
+                  }
+                });
+              }
+            }
+          } catch {
+            // ignore
+          }
+
           // Trigger Confetti
           try {
             confetti({
