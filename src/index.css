@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @utility pt-safe {
   padding-top: max(env(safe-area-inset-top, 0px), 16px);
 }
