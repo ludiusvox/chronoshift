@@ -5,6 +5,7 @@
  */
 
 import initSqlJs, { Database } from 'sql.js';
+import sqlWasmUrl from 'sql.js/dist/sql-wasm.wasm?url';
 import { ShiftRecord, PayPeriodSettings, BreakLog } from '../types';
 
 const DB_STORE_NAME = 'chronoshift_sqlite_blob';
@@ -131,7 +132,7 @@ export async function getDatabase(): Promise<Database> {
     isInitializing = true;
     try {
       const SQL = await initSqlJs({
-        locateFile: (file) => `/${file}`,
+        locateFile: () => sqlWasmUrl,
       });
 
       const savedBlob = await loadSavedDatabaseBlob();
@@ -424,7 +425,7 @@ export async function exportSqliteFile(): Promise<Blob> {
 export async function importSqliteFile(file: File): Promise<void> {
   const buffer = await file.arrayBuffer();
   const uint8 = new Uint8Array(buffer);
-  const SQL = await initSqlJs({ locateFile: (f) => `/${f}` });
+  const SQL = await initSqlJs({ locateFile: () => sqlWasmUrl });
   const newDb = new SQL.Database(uint8);
   dbInstance = newDb;
   await saveDatabaseToDisk();
