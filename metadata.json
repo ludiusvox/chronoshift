@@ -1,0 +1,6 @@
+{
+  "name": "ChronoShift - 2-Week Timesheet & Break Tracker",
+  "description": "Mobile-ready bi-weekly timesheet with embedded SQLite database, overtime 1.5x calculations, audio-alert rest & smoke break timers, and SMS/Email clipboard exports.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
