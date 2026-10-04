@@ -18,10 +18,10 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file('/home/ludiusvox/StudioProjects/google-key.jks')
-            storePassword 'nutritrack2024'
-            keyAlias 'nutritrack-key'
-            keyPassword 'nutritrack2024'
+            storeFile file('/home/ludiusvox/StudioProjects/release-upload-key.jks')
+            storePassword 'Lb6XksFRqJ1KeP1VvX886co'
+            keyAlias 'upload'
+            keyPassword 'Lb6XksFRqJ1KeP1VvX886co'
         }
     }
     buildTypes {
