@@ -220,9 +220,9 @@ export async function getShiftsForPeriod(startDate: string): Promise<ShiftRecord
   const timesheetId = `ts_${startDate}`;
 
   // Check if shifts exist
-  const res = db.exec("SELECT id, timesheet_id, date, day_index, clock_in, clock_out, lunch_minutes, break_minutes, is_day_off, notes, job_code, updated_at FROM shifts WHERE timesheet_id = ? ORDER BY day_index ASC", [timesheetId]);
+  const res = db.exec("SELECT id, timesheet_id, date, day_index, clock_in, clock_out, lunch_minutes, break_minutes, is_day_off, notes, job_code, updated_at FROM shifts WHERE timesheet_id = ? ORDER BY day_index ASC, updated_at ASC", [timesheetId]);
 
-  if (res.length > 0 && res[0].values.length === 14) {
+  if (res.length > 0 && res[0].values.length > 0) {
     return res[0].values.map((row) => {
       const date = String(row[2]);
       return {
@@ -245,6 +245,26 @@ export async function getShiftsForPeriod(startDate: string): Promise<ShiftRecord
 
   // Otherwise generate 14 days initialized for this pay period
   return await initialize14DayPeriod(startDate);
+}
+
+export async function addShiftForDate(startDate: string, dateStr: string, dayIndex: number): Promise<ShiftRecord[]> {
+  const db = await getDatabase();
+  const timesheetId = `ts_${startDate}`;
+  const shiftId = `shift_${timesheetId}_${dateStr}_${Date.now()}`;
+
+  db.run(
+    "INSERT INTO shifts (id, timesheet_id, date, day_index, clock_in, clock_out, lunch_minutes, break_minutes, is_day_off, notes, job_code, updated_at) VALUES (?, ?, ?, ?, '', '', 0, 0, 0, '', '', ?)",
+    [shiftId, timesheetId, dateStr, dayIndex, new Date().toISOString()]
+  );
+  await saveDatabaseToDisk();
+  return await getShiftsForPeriod(startDate);
+}
+
+export async function deleteShift(shiftId: string, startDate: string): Promise<ShiftRecord[]> {
+  const db = await getDatabase();
+  db.run("DELETE FROM shifts WHERE id = ?", [shiftId]);
+  await saveDatabaseToDisk();
+  return await getShiftsForPeriod(startDate);
 }
 
 export async function initialize14DayPeriod(startDateStr: string): Promise<ShiftRecord[]> {

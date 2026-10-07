@@ -65,29 +65,60 @@ export function calculateBiWeeklyPay(
   const otThreshold = settings.overtimeThresholdWeekly || 40;
   const otMultiplier = settings.overtimeMultiplier || 1.5;
 
-  // Split into Week 1 (indices 0..6) and Week 2 (indices 7..13)
-  const week1Shifts = shifts.slice(0, 7);
-  const week2Shifts = shifts.slice(7, 14);
+  // Split into Week 1 (dayIndex 0..6) and Week 2 (dayIndex 7..13)
+  const week1Shifts = shifts.filter((s) => s.dayIndex < 7);
+  const week2Shifts = shifts.filter((s) => s.dayIndex >= 7);
 
   function calculateSingleWeek(weekShifts: ShiftRecord[], weekNum: 1 | 2): WeekCalculation {
     let weekTotalWorked = 0;
 
-    const dailyBreakdown = weekShifts.map((shift) => {
-      const worked = shift.isDayOff
-        ? 0
-        : calculateShiftWorkedHours(shift.clockIn, shift.clockOut, shift.lunchMinutes);
-      weekTotalWorked += worked;
+    // Group shifts by date to support multiple shifts per day (split shifts)
+    const dateMap = new Map<string, ShiftRecord[]>();
+    weekShifts.forEach((shift) => {
+      const existing = dateMap.get(shift.date) || [];
+      existing.push(shift);
+      dateMap.set(shift.date, existing);
+    });
 
-      return {
-        date: shift.date,
-        dayName: shift.dayName,
-        clockIn: shift.clockIn,
-        clockOut: shift.clockOut,
-        lunchMinutes: shift.lunchMinutes,
-        workedHours: worked,
-        regularHours: 0, // computed below
-        overtimeHours: 0, // computed below
-      };
+    const dailyBreakdown: {
+      date: string;
+      dayName: string;
+      clockIn: string;
+      clockOut: string;
+      lunchMinutes: number;
+      workedHours: number;
+      regularHours: number;
+      overtimeHours: number;
+    }[] = [];
+
+    dateMap.forEach((shiftsForDay, dateStr) => {
+      const dayName = shiftsForDay[0]?.dayName || '';
+      let dayWorked = 0;
+      let totalLunch = 0;
+      const firstClockIn = shiftsForDay[0]?.clockIn || '';
+      const lastClockOut = shiftsForDay[shiftsForDay.length - 1]?.clockOut || '';
+
+      shiftsForDay.forEach((s) => {
+        if (!s.isDayOff) {
+          const w = calculateShiftWorkedHours(s.clockIn, s.clockOut, s.lunchMinutes);
+          dayWorked += w;
+          totalLunch += s.lunchMinutes;
+        }
+      });
+
+      dayWorked = Math.round(dayWorked * 100) / 100;
+      weekTotalWorked += dayWorked;
+
+      dailyBreakdown.push({
+        date: dateStr,
+        dayName,
+        clockIn: firstClockIn,
+        clockOut: lastClockOut,
+        lunchMinutes: totalLunch,
+        workedHours: dayWorked,
+        regularHours: 0,
+        overtimeHours: 0,
+      });
     });
 
     weekTotalWorked = Math.round(weekTotalWorked * 100) / 100;

@@ -387,6 +387,7 @@ export default function App() {
               onUpdateShift={handleUpdateShift}
               onNavigatePeriod={handleNavigatePeriod}
               onChangeStartDate={handleChangeStartDate}
+              onRefreshShifts={loadDatabaseData}
             />
           </div>
         )}
