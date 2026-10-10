@@ -17,7 +17,6 @@ import {
   Calendar,
   Clock,
   Coffee,
-  Database,
   Share2,
   DollarSign,
   CheckCircle,
@@ -33,7 +32,6 @@ import { TimesheetView } from './components/TimesheetView';
 import { BreakTimer } from './components/BreakTimer';
 import { ExportModal } from './components/ExportModal';
 import { SettingsModal } from './components/SettingsModal';
-import { DatabaseViewer } from './components/DatabaseViewer';
 import { TimeCardCorrection } from './components/TimeCardCorrection';
 import { MobileNav } from './components/MobileNav';
 
@@ -73,12 +71,13 @@ export default function App() {
     currencySymbol: '$',
     enableDailyOvertime: false,
     dailyOvertimeThreshold: 8,
+    employeeName: '',
   });
 
   const [shifts, setShifts] = useState<ShiftRecord[]>([]);
 
   // Navigation & Modals state
-  const [activeTab, setActiveTab] = useState<'timesheet' | 'punch' | 'timer' | 'correction' | 'database'>('timesheet');
+  const [activeTab, setActiveTab] = useState<'timesheet' | 'punch' | 'timer' | 'correction'>('timesheet');
   const [activeWeekTab, setActiveWeekTab] = useState<'all' | 'week1' | 'week2'>('all');
   const [isExportOpen, setIsExportOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
@@ -172,7 +171,7 @@ export default function App() {
       const now = new Date();
       const day = now.getDay();
       const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-      newStart = new Date(now.setDate(diff));
+      newStart = new Date(now.getFullYear(), now.getMonth(), diff);
     } else {
       const cur = new Date(settings.periodStartDate + 'T00:00:00');
       const offset = direction === 'next' ? 14 : -14;
@@ -180,7 +179,11 @@ export default function App() {
       newStart = cur;
     }
 
-    const newStartStr = newStart.toISOString().split('T')[0];
+    const y = newStart.getFullYear();
+    const m = String(newStart.getMonth() + 1).padStart(2, '0');
+    const d = String(newStart.getDate()).padStart(2, '0');
+    const newStartStr = `${y}-${m}-${d}`;
+
     const updated = { ...settings, periodStartDate: newStartStr };
     setSettings(updated);
     await updateSettings(updated);
@@ -263,7 +266,6 @@ export default function App() {
         settings={settings}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
-        onOpenDatabase={() => setActiveTab('database')}
         onUpdateRate={handleUpdateRate}
         sqliteActive={!dbError}
       />
@@ -336,18 +338,6 @@ export default function App() {
             >
               <Edit3 className="w-4 h-4 text-purple-500" />
               <span>Fix Timecard</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('database')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition ${
-                activeTab === 'database'
-                  ? 'bg-slate-900 text-white dark:bg-slate-800 shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/50'
-              }`}
-            >
-              <Database className="w-4 h-4 text-indigo-500" />
-              <span>SQLite Inspector</span>
             </button>
           </div>
 
@@ -433,10 +423,6 @@ export default function App() {
             onShowToast={showToast}
           />
         )}
-
-        {activeTab === 'database' && (
-          <DatabaseViewer onDataChanged={loadDatabaseData} />
-        )}
       </main>
 
       {/* Floating Toast Notification */}
@@ -461,13 +447,13 @@ export default function App() {
         onClose={() => setIsSettingsOpen(false)}
         settings={settings}
         onSaveSettings={handleSaveSettings}
+        onDataChanged={loadDatabaseData}
       />
 
       {/* Mobile Navigation Bar */}
       <MobileNav
         activeTab={activeTab}
         onChangeTab={setActiveTab}
-        onOpenExport={() => setIsExportOpen(true)}
       />
     </div>
   );

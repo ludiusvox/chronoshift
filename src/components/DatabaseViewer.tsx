@@ -51,15 +51,35 @@ export const DatabaseViewer: React.FC<DatabaseViewerProps> = ({ onDataChanged })
 
   const handleRunQuery = async () => {
     if (!customSql.trim()) return;
+
+    const upper = customSql.trim().toUpperCase();
+    const isMutating =
+      upper.startsWith('INSERT') ||
+      upper.startsWith('UPDATE') ||
+      upper.startsWith('DELETE') ||
+      upper.startsWith('DROP') ||
+      upper.startsWith('ALTER') ||
+      upper.startsWith('CREATE');
+
+    if (isMutating) {
+      const confirmed = window.confirm(
+        '⚠️ SECURITY SAFEGUARD:\nYou are about to execute a data-mutating SQL query that modifies the database.\n\nAre you sure you want to proceed?'
+      );
+      if (!confirmed) return;
+    }
+
     setIsExecuting(true);
     setQueryError(null);
     try {
       const res = await executeRawQuery(customSql);
       setQueryResult(res);
       if (
-        customSql.toUpperCase().includes('UPDATE') ||
-        customSql.toUpperCase().includes('INSERT') ||
-        customSql.toUpperCase().includes('DELETE')
+        upper.includes('UPDATE') ||
+        upper.includes('INSERT') ||
+        upper.includes('DELETE') ||
+        upper.includes('DROP') ||
+        upper.includes('ALTER') ||
+        upper.includes('CREATE')
       ) {
         if (onDataChanged) onDataChanged();
         loadTable(selectedTable);

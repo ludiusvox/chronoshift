@@ -45,6 +45,7 @@ export interface PayPeriodSettings {
   currencySymbol: string; // default '$'
   enableDailyOvertime: boolean; // over 8 hrs/day (California etc.)
   dailyOvertimeThreshold: number; // 8
+  employeeName?: string;
 }
 
 export interface WeekCalculation {

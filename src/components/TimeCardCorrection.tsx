@@ -74,6 +74,19 @@ export const TimeCardCorrection: React.FC<TimeCardCorrectionProps> = ({ settings
 
   const handleSaveCorrection = async () => {
     if (!currentShift) return;
+    if (currentShift.clockOut && !currentShift.clockIn) {
+      onShowToast('Error: Clock In time is required when Clock Out is set.');
+      return;
+    }
+    if (currentShift.clockIn && currentShift.clockOut) {
+      const [inH, inM] = currentShift.clockIn.split(':').map(Number);
+      const [outH, outM] = currentShift.clockOut.split(':').map(Number);
+      if (outH * 60 + outM < inH * 60 + inM) {
+        if (!window.confirm(`Clock Out (${currentShift.clockOut}) is earlier than Clock In (${currentShift.clockIn}). Save as overnight shift?`)) {
+          return;
+        }
+      }
+    }
     playButtonTapSound();
     try {
       await updateShift(currentShift);

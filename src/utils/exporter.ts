@@ -125,7 +125,8 @@ export function generateCsvExport(
   calc: BiWeeklyCalculation,
   shifts: ShiftRecord[],
   settings: PayPeriodSettings,
-  employeeName: string = ''
+  employeeName: string = '',
+  excludeEmptyDays: boolean = false
 ): string {
   const lines: string[] = [];
   lines.push(`"Employee","${employeeName.replace(/"/g, '""')}"`);
@@ -135,7 +136,11 @@ export function generateCsvExport(
   lines.push('');
   lines.push(`"Week","Date","Day","Clock In","Clock Out","Lunch (mins)","Break (mins)","Day Off","Worked Hours","Regular Hours","Overtime Hours","Notes","Job Code"`);
 
-  shifts.forEach((s) => {
+  const filteredShifts = excludeEmptyDays
+    ? shifts.filter((s) => !s.isDayOff && (s.clockIn || s.clockOut))
+    : shifts;
+
+  filteredShifts.forEach((s) => {
     const isW1 = s.dayIndex < 7;
     const weekNum = isW1 ? 1 : 2;
     const dayBreakdown = isW1

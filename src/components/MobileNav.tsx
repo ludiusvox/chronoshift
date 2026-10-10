@@ -1,9 +1,9 @@
 import React from 'react';
-import { Clock, Calendar, Coffee, Database, Edit3 } from 'lucide-react';
+import { Clock, Calendar, Coffee, Edit3 } from 'lucide-react';
 
 interface MobileNavProps {
-  activeTab: 'timesheet' | 'punch' | 'timer' | 'correction' | 'database';
-  onChangeTab: (tab: 'timesheet' | 'punch' | 'timer' | 'correction' | 'database') => void;
+  activeTab: 'timesheet' | 'punch' | 'timer' | 'correction';
+  onChangeTab: (tab: 'timesheet' | 'punch' | 'timer' | 'correction') => void;
   onOpenExport: () => void;
 }
 
@@ -13,7 +13,7 @@ export const MobileNav: React.FC<MobileNavProps> = ({
 }) => {
   return (
     <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 pb-safe">
-      <div className="grid grid-cols-5 h-16 items-center px-1">
+      <div className="grid grid-cols-4 h-16 items-center px-2">
         {/* Timesheet */}
         <button
           onClick={() => onChangeTab('timesheet')}
@@ -64,19 +64,6 @@ export const MobileNav: React.FC<MobileNavProps> = ({
         >
           <Edit3 className="w-5 h-5 mb-0.5" />
           <span className="text-[10px]">Fix Time</span>
-        </button>
-
-        {/* Database */}
-        <button
-          onClick={() => onChangeTab('database')}
-          className={`flex flex-col items-center justify-center h-full transition ${
-            activeTab === 'database'
-              ? 'text-sky-600 dark:text-sky-400 font-bold'
-              : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'
-          }`}
-        >
-          <Database className="w-5 h-5 mb-0.5" />
-          <span className="text-[10px]">SQLite</span>
         </button>
       </div>
     </nav>

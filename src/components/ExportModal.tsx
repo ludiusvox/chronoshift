@@ -36,8 +36,9 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'sms' | 'email' | 'csv'>('sms');
   const [employeeName, setEmployeeName] = useState<string>(() => {
-    return localStorage.getItem('chronoshift_employee_name') || '';
+    return settings.employeeName || localStorage.getItem('chronoshift_employee_name') || '';
   });
+  const [excludeEmptyDays, setExcludeEmptyDays] = useState<boolean>(false);
   const [copiedType, setCopiedType] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -49,7 +50,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   const smsText = generateTextMessageExport(calculation, shifts, settings, employeeName);
   const emailData = generateEmailExport(calculation, shifts, settings, employeeName);
-  const csvText = generateCsvExport(calculation, shifts, settings, employeeName);
+  const csvText = generateCsvExport(calculation, shifts, settings, employeeName, excludeEmptyDays);
 
   const handleCopy = async (text: string, type: string) => {
     const success = await copyToClipboard(text);
@@ -298,6 +299,20 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                     <span>Download .CSV File</span>
                   </button>
                 </div>
+              </div>
+
+              {/* Omit blank days toggle */}
+              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
+                <input
+                  type="checkbox"
+                  id="exclude-empty-days"
+                  checked={excludeEmptyDays}
+                  onChange={(e) => setExcludeEmptyDays(e.target.checked)}
+                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+                />
+                <label htmlFor="exclude-empty-days" className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  Omit blank days / days off from CSV export
+                </label>
               </div>
 
               <div className="relative">

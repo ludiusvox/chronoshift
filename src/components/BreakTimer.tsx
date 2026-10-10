@@ -228,7 +228,7 @@ export const BreakTimer: React.FC<BreakTimerProps> = ({
           </div>
           <span className="text-xs font-bold">Smoke Break</span>
           <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-            {smokePreset} mins
+            {smokePreset} {smokePreset === 1 ? 'min' : 'mins'}
           </span>
         </button>
 
@@ -282,7 +282,7 @@ export const BreakTimer: React.FC<BreakTimerProps> = ({
           </div>
           <span className="text-xs font-bold">Custom Timer</span>
           <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-            {customInputMins} mins
+            {customInputMins} {customInputMins === 1 ? 'min' : 'mins'}
           </span>
         </button>
       </div>

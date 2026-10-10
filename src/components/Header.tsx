@@ -1,5 +1,5 @@
 import React from 'react';
-import { Moon, Sun, Clock, Database, DollarSign, Settings, Share2 } from 'lucide-react';
+import { Moon, Sun, Clock, DollarSign, Settings, Share2 } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
 import { PayPeriodSettings } from '../types';
 
@@ -9,7 +9,6 @@ interface HeaderProps {
   settings: PayPeriodSettings;
   onOpenSettings: () => void;
   onOpenExport: () => void;
-  onOpenDatabase: () => void;
   onUpdateRate: (newRate: number) => void;
   sqliteActive: boolean;
 }
@@ -20,9 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
   settings,
   onOpenSettings,
   onOpenExport,
-  onOpenDatabase,
   onUpdateRate,
-  sqliteActive,
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md transition-colors pt-safe pb-1">
@@ -71,16 +68,6 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-[10px] text-slate-400 font-medium hidden sm:inline">/hr</span>
             </div>
           </div>
-
-          {/* SQLite DB pill indicator */}
-          <button
-            onClick={onOpenDatabase}
-            className="flex items-center gap-1 px-2 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-            title="Embedded SQLite Database Inspector"
-          >
-            <Database className={`w-3.5 h-3.5 ${sqliteActive ? 'text-indigo-500 animate-pulse' : 'text-slate-400'}`} />
-            <span className="hidden md:inline">SQLite</span>
-          </button>
 
           {/* Export to SMS/Email button */}
           <button

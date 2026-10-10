@@ -69,6 +69,19 @@ export const TimesheetView: React.FC<TimesheetViewProps> = ({
 
   // Handler for quick shift changes
   const handleTimeChange = (shift: ShiftRecord, field: 'clockIn' | 'clockOut', value: string) => {
+    if (field === 'clockOut' && value && !shift.clockIn) {
+      alert('Clock In time is required before setting Clock Out.');
+      return;
+    }
+    if (field === 'clockOut' && value && shift.clockIn) {
+      const [inH, inM] = shift.clockIn.split(':').map(Number);
+      const [outH, outM] = value.split(':').map(Number);
+      if (outH * 60 + outM < inH * 60 + inM) {
+        if (!window.confirm(`Clock Out (${value}) is earlier than Clock In (${shift.clockIn}). Is this an overnight shift?`)) {
+          return;
+        }
+      }
+    }
     const updated = { ...shift, [field]: value, isDayOff: false };
     onUpdateShift(updated);
   };
@@ -472,6 +485,19 @@ export const TimesheetView: React.FC<TimesheetViewProps> = ({
               </button>
               <button
                 onClick={() => {
+                  if (selectedShiftForEdit.clockOut && !selectedShiftForEdit.clockIn) {
+                    alert('Clock In time is required when Clock Out is set.');
+                    return;
+                  }
+                  if (selectedShiftForEdit.clockIn && selectedShiftForEdit.clockOut) {
+                    const [inH, inM] = selectedShiftForEdit.clockIn.split(':').map(Number);
+                    const [outH, outM] = selectedShiftForEdit.clockOut.split(':').map(Number);
+                    if (outH * 60 + outM < inH * 60 + inM) {
+                      if (!window.confirm(`Clock Out (${selectedShiftForEdit.clockOut}) is earlier than Clock In (${selectedShiftForEdit.clockIn}). Save as overnight shift?`)) {
+                        return;
+                      }
+                    }
+                  }
                   onUpdateShift(selectedShiftForEdit);
                   setSelectedShiftForEdit(null);
                 }}
